@@ -20,10 +20,10 @@ int datacheck = 0;
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO1, &RxHeader, RxData);
-  if ((RxHeader.StdId == 0x010))
-  {
-	  datacheck = 1;
-  }
+	if (RxHeader.StdId == 0x001)
+	{
+		datacheck = 1;
+	}
 }
 
 int main(void)
@@ -45,7 +45,7 @@ int main(void)
   TxHeader.DLC = 2;  // data length
   TxHeader.IDE = CAN_ID_STD;
   TxHeader.RTR = CAN_RTR_DATA;
-  TxHeader.StdId = 0x001;  // ID
+  TxHeader.StdId = 0x002;  // ID
 
 
   TxData[0] = 200;  // ms delay
@@ -137,12 +137,12 @@ static void MX_CAN_Init(void)
   CAN_FilterTypeDef canfilterconfig;
 
   canfilterconfig.FilterActivation = CAN_FILTER_ENABLE;
-  canfilterconfig.FilterBank = 10;  // which filter bank to use from the assigned ones
+  canfilterconfig.FilterBank = 0;  // which filter bank to use from the assigned ones
   canfilterconfig.FilterFIFOAssignment = CAN_FILTER_FIFO1;
-  canfilterconfig.FilterIdHigh = 0x010<<5;
+  canfilterconfig.FilterIdHigh = 0;
   canfilterconfig.FilterIdLow = 0;
-  canfilterconfig.FilterMaskIdHigh = 0xfef<<5;
-  canfilterconfig.FilterMaskIdLow = 0x0000;
+  canfilterconfig.FilterMaskIdHigh = 0;
+  canfilterconfig.FilterMaskIdLow = 0;
   canfilterconfig.FilterMode = CAN_FILTERMODE_IDMASK;
   canfilterconfig.FilterScale = CAN_FILTERSCALE_32BIT;
   canfilterconfig.SlaveStartFilterBank = 0;  // doesn't matter in single can controllers

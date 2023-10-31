@@ -1,10 +1,61 @@
+/* USER CODE BEGIN Header */
+/**
+  ******************************************************************************
+  * @file           : main.c
+  * @brief          : Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
+  * All rights reserved.</center></h2>
+  *
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
+  *
+  ******************************************************************************
+  */
+/* USER CODE END Header */
+/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+/* Private includes ----------------------------------------------------------*/
+/* USER CODE BEGIN Includes */
+
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
+/* USER CODE END PTD */
+
+/* Private define ------------------------------------------------------------*/
+/* USER CODE BEGIN PD */
+/* USER CODE END PD */
+
+/* Private macro -------------------------------------------------------------*/
+/* USER CODE BEGIN PM */
+
+/* USER CODE END PM */
+
+/* Private variables ---------------------------------------------------------*/
 CAN_HandleTypeDef hcan1;
 
+/* USER CODE BEGIN PV */
+
+/* USER CODE END PV */
+
+/* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_CAN1_Init(void);
+/* USER CODE BEGIN PFP */
+
+/* USER CODE END PFP */
+
+/* Private user code ---------------------------------------------------------*/
+/* USER CODE BEGIN 0 */
 
 CAN_TxHeaderTypeDef TxHeader;
 CAN_RxHeaderTypeDef RxHeader;
@@ -22,12 +73,6 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		TxData[0] = 100;   // ms Delay
 		TxData[1] = 40;    // loop rep
-		
-		TxHeader.DLC = 2;  // data length
-		TxHeader.IDE = CAN_ID_STD;
-		TxHeader.RTR = CAN_RTR_DATA;
-		TxHeader.StdId = 0x002;  // ID
-
 
 		HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox);
 	}
@@ -37,38 +82,71 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO0, &RxHeader, RxData);
-  if ((RxHeader.StdId == 0x00000001))
-  {
-	  datacheck = 1;
-  }
-//	else if ((RxHeader.StdId == 0x002))
-//  {
-//	  datacheck = 2;
-//  }
+	if (RxHeader.StdId == 0x002)
+	{
+		datacheck = 1;
+	}
 }
 
 
+/* USER CODE END 0 */
 
+/**
+  * @brief  The application entry point.
+  * @retval int
+  */
 int main(void)
 {
+  /* USER CODE BEGIN 1 */
 
+  /* USER CODE END 1 */
+
+  /* MCU Configuration--------------------------------------------------------*/
+
+  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
+  /* Configure the system clock */
   SystemClock_Config();
 
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CAN1_Init();
+  /* USER CODE BEGIN 2 */
 
   HAL_CAN_Start(&hcan1);
 
   // Activate the notification
   HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
-	
 
+
+  TxHeader.DLC = 2;  // data length
+  TxHeader.IDE = CAN_ID_STD;
+  TxHeader.RTR = CAN_RTR_DATA;
+  TxHeader.StdId = 0x001;  // ID
+
+
+
+
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
   while (1)
   {
+    /* USER CODE END WHILE */
 
-	  if (datacheck == 1)
+    /* USER CODE BEGIN 3 */
+
+	  if (datacheck)
 	  {
 		  // blink the LED
 		  for (int i=0; i<RxData[1]; i++)
@@ -81,13 +159,17 @@ int main(void)
 
 			TxData[0] = 100;   // ms Delay
 			TxData[1] = 40;    // loop rep
-		
+
 			HAL_CAN_AddTxMessage(&hcan1, &TxHeader, TxData, &TxMailbox);
 	  }
   }
-
+  /* USER CODE END 3 */
 }
 
+/**
+  * @brief System Clock Configuration
+  * @retval None
+  */
 void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
@@ -134,10 +216,21 @@ void SystemClock_Config(void)
   }
 }
 
-
+/**
+  * @brief CAN1 Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_CAN1_Init(void)
 {
 
+  /* USER CODE BEGIN CAN1_Init 0 */
+
+  /* USER CODE END CAN1_Init 0 */
+
+  /* USER CODE BEGIN CAN1_Init 1 */
+
+  /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
   hcan1.Init.Prescaler = 18;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
@@ -159,22 +252,27 @@ static void MX_CAN1_Init(void)
   CAN_FilterTypeDef canfilterconfig;
 
   canfilterconfig.FilterActivation = CAN_FILTER_ENABLE;
-  canfilterconfig.FilterBank = 18;  // which filter bank to use from the assigned ones
+  canfilterconfig.FilterBank = 0;  // which filter bank to use from the assigned ones
   canfilterconfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-  canfilterconfig.FilterIdHigh = 0x0000;
-  canfilterconfig.FilterIdLow = 0x0000;
-  canfilterconfig.FilterMaskIdHigh = 0x0000;
+  canfilterconfig.FilterIdHigh = 0;
+  canfilterconfig.FilterIdLow = 0;
+  canfilterconfig.FilterMaskIdHigh = 0;
   canfilterconfig.FilterMaskIdLow = 0x0000;
   canfilterconfig.FilterMode = CAN_FILTERMODE_IDMASK;
   canfilterconfig.FilterScale = CAN_FILTERSCALE_32BIT;
-  canfilterconfig.SlaveStartFilterBank = 20;  // how many filters to assign to the CAN1 (master can)
+  canfilterconfig.SlaveStartFilterBank = 0;  // how many filters to assign to the CAN1 (master can)
 
   HAL_CAN_ConfigFilter(&hcan1, &canfilterconfig);
 
-
+  /* USER CODE END CAN1_Init 2 */
 
 }
 
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -206,6 +304,14 @@ static void MX_GPIO_Init(void)
 
 }
 
+/* USER CODE BEGIN 4 */
+
+/* USER CODE END 4 */
+
+/**
+  * @brief  This function is executed in case of error occurrence.
+  * @retval None
+  */
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
