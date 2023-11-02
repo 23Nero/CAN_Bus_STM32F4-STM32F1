@@ -115,7 +115,7 @@ typedef struct
                                        This parameter must be a number between Min_Data = 0x0000 and Max_Data = 0xFFFF. */
 
   uint32_t FilterMaskIdLow;       /*!< Specifies the filter mask number or identification number,
-                                       according to the mode (LSBs for a 32-bit configuration,
+                                       accrding to the mode (LSBs for a 32-bit configuration,
                                        second one for a 16-bit configuration).
                                        This parameter must be a number between Min_Data = 0x0000 and Max_Data = 0xFFFF. */
 

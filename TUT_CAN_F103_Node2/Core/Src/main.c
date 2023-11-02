@@ -14,18 +14,16 @@ uint8_t RxData[8];
 
 uint32_t TxMailbox;
 
-int datacheck = 0;
+volatile int datacheck = 0;
 
 
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)
 {
 	HAL_CAN_GetRxMessage(hcan, CAN_RX_FIFO1, &RxHeader, RxData);
-  if ((RxHeader.StdId == 0x002))
-  {
-	  datacheck = 1;
-  }
+	if(RxHeader.StdId == 0x002){
+		datacheck = 1;
+	}
 }
-
 int main(void)
 {
   HAL_Init();
@@ -44,12 +42,7 @@ int main(void)
   TxData[0] = 200;  // ms delay
   TxData[1] = 20;  // loop rep
 	
-				TxHeader.DLC = 2;  // data length
-			TxHeader.IDE = CAN_ID_STD;
-			TxHeader.RTR = CAN_RTR_DATA;
-			TxHeader.StdId = 0x002;  // ID
-
-		  HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
+	
 
   while (1)
   {
@@ -59,10 +52,10 @@ int main(void)
 	  if (datacheck)
 	  {
 		  // blink the LED
-		  for (int i=0; i<RxData[1]; i++)
+		  for (int i=0; i<20; i++)
 		  {
 			  HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-			  HAL_Delay(RxData[0]);
+			  HAL_Delay(200);
 		  }
 
 		  datacheck = 0;
@@ -70,7 +63,7 @@ int main(void)
 			TxHeader.DLC = 2;  // data length
 			TxHeader.IDE = CAN_ID_STD;
 			TxHeader.RTR = CAN_RTR_DATA;
-			TxHeader.StdId = 0x002;  // ID
+			TxHeader.StdId = 0x001;  // ID
 
 		  HAL_CAN_AddTxMessage(&hcan, &TxHeader, TxData, &TxMailbox);
 
@@ -139,9 +132,9 @@ static void MX_CAN_Init(void)
   canfilterconfig.FilterActivation = CAN_FILTER_ENABLE;
   canfilterconfig.FilterBank = 0;  // which filter bank to use from the assigned ones
   canfilterconfig.FilterFIFOAssignment = CAN_FILTER_FIFO1;
-  canfilterconfig.FilterIdHigh = 0;
-  canfilterconfig.FilterIdLow = 0;
-  canfilterconfig.FilterMaskIdHigh = 0;
+  canfilterconfig.FilterIdHigh = 0x002 << 5;
+  canfilterconfig.FilterIdLow = 0x0000;
+  canfilterconfig.FilterMaskIdHigh = 0x7ffd << 5;
   canfilterconfig.FilterMaskIdLow = 0;
   canfilterconfig.FilterMode = CAN_FILTERMODE_IDMASK;
   canfilterconfig.FilterScale = CAN_FILTERSCALE_32BIT;
